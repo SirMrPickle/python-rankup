@@ -1,14 +1,9 @@
 {
+    "menu": "image not found exception",
     "teleporter": [
-        2115,
-        470
+        257,
+        711
     ],
-    "teleport_spawn": [
-        563,
-        535
-    ],
-    "teleport_best_area": [
-        560,
-        535
-    ]
+    "teleport_spawn": "image not found exception",
+    "teleport_best_area": "image not found exception"
 }
