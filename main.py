@@ -1,10 +1,18 @@
 import time, pyautogui, pytesseract
 
 def useItem(itemName):
-    return itemName
+    pyautogui.leftClick(menuCoords)
+    time.sleep(0.5)
+    pyautogui.leftClick(searchbarCoords)
+    time.sleep(0.5)
+    pyautogui.typewrite(itemName)
+    time.sleep(0.5)
+    pyautogui.press('enter')
+    time.sleep(0.5)
+    pyautogui.leftClick(firstItemCoords)
 
 def teleportSpawn():
-    return
+    pyautogui.leftClick(teleporterCoords)
 
 def teleportBestArea():
     return
@@ -19,5 +27,3 @@ def locationInit():
 
 time.sleep(2)
 locationInit()
-
-pytesseract.image_to_string("./images/pinatas.png")
