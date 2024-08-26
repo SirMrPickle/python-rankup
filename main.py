@@ -1,47 +1,73 @@
-import time
 import pyautogui
 import json
+import pytesseract
+from PIL import ImageGrab
+import time
 
-def useItem(itemName):
-    coords = loadCoords()
-    pyautogui.leftClick(coords['menuCoords'])
-    time.sleep(0.5)
-    pyautogui.leftClick(coords['searchbarCoords'])
-    time.sleep(0.5)
-    pyautogui.typewrite(itemName)
-    time.sleep(0.5)
-    pyautogui.press('enter')
-    time.sleep(0.5)
-    pyautogui.leftClick(coords['firstItemCoords'])
+def load_coordinates(config_file):
+    with open(config_file, 'r') as f:
+        coords = json.load(f)
+    return coords
 
-def teleportSpawn():
-    coords = loadCoords()
-    pyautogui.leftClick(coords['teleporterCoords'])
+def click_location(location):
+    """
+    Click at the specified screen coordinates.
+    """
+    pyautogui.click(location)
+    print(f"Clicked at {location}")
 
-def teleportBestArea():
-    # Implementation for finding and clicking the best area teleport goes here
-    pass
-
-def locationInit():
-    coords = {}
-    coords['menuCoords'] = locateAndSaveCoords('./images/menu.png')
-    coords['searchbarCoords'] = locateAndSaveCoords('./images/searchbar.png')
-    coords['firstItemCoords'] = locateAndSaveCoords('./images/first_item.png')
-    coords['teleporterCoords'] = locateAndSaveCoords('./images/teleporter.png')
-    
-    with open("config.json", "w") as conf_file:
-        json.dump(coords, conf_file)
-
-def locateAndSaveCoords(image_path):
-    coords = pyautogui.locateOnScreen(image_path, grayscale=True)
-    if coords is not None:
-        return (coords.left, coords.top)  # Save as a tuple
+def use_item(coords, item_name):
+    """
+    Simulate the action of using an item by clicking its location.
+    """
+    if item_name in coords:
+        location = coords[item_name]
+        if location != "not found":
+            click_location(location)
+        else:
+            print(f"{item_name} coordinates not found in config.")
     else:
-        return "no coords found"
+        print(f"{item_name} not in config.")
 
-def loadCoords():
-    with open("config.json", "r") as conf_file:
-        return json.load(conf_file)
+def teleport_to_location(coords, location_name):
+    """
+    Teleport to a specific location.
+    """
+    use_item(coords, location_name)
 
-time.sleep(2)
-locationInit()
+def read_text_from_screen(region):
+    """
+    Use OCR to read text from a specific screen region.
+    """
+    screenshot = ImageGrab.grab(bbox=region)
+    text = pytesseract.image_to_string(screenshot)
+    return text
+
+def perform_quest_action(coords):
+    """
+    Perform actions based on quest text read from the screen.
+    """
+    # Example region for quest area (adjust as needed)
+    quest_region = (100, 100, 500, 300)  # Example coordinates for the quest area
+    quest_text = read_text_from_screen(quest_region)
+    print("Quest Text:", quest_text)
+
+    if "break" in quest_text:
+        # Example action based on quest text
+        use_item(coords, "coin_jar")  # Replace with actual item name
+
+def main():
+    config_file = "config.json"
+    coords = load_coordinates(config_file)
+    
+    # Example usage
+    teleport_to_location(coords, "teleport_spawn")
+    time.sleep(2)  # Wait for 2 seconds
+    teleport_to_location(coords, "teleport_best_area")
+    time.sleep(2)  # Wait for 2 seconds
+    
+    # Perform quest action
+    perform_quest_action(coords)
+
+if __name__ == "__main__":
+    main()
